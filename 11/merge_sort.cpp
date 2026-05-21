@@ -3,22 +3,6 @@
 
 using namespace std;
 
-// vector<int> merge(vector<int>& nums, int st, int end, int mid) {
-//     vector<int> sorted;
-//     // base case
-//     if(nums.size() == 1) {
-        
-//     }
-    
-//     if(s < e) {
-
-
-//         int left = merge(nums, st, mid);
-//         int right = merge(nums, mid+1, end);
-//     }
-    
-// }
-
 void merge(vector<int>&nums, int st, int mid, int end) {
     vector<int> temp;
     int i = st, j = mid+1;
