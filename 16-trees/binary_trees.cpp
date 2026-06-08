@@ -155,6 +155,158 @@ class BinaryTree {
 
         return maxDiam;
     }
+
+    // kth level of a binary tree - return nodes at kth (valid) level of tree
+    void kth_level(Node* root, int k) {
+        if(root == NULL) return;
+
+        if(k == 1) {
+            cout << root->val << " ";
+            return;
+        }
+
+        kth_level(root->left, k-1);
+        kth_level(root->right, k-1);
+    }
+
+    Node* lca(Node* root, Node* p, Node* q) {
+        // return lowest common ancestor
+        if(root == NULL) return NULL;
+
+        if(root->val == p->val || root->val == q->val) {
+            return root;
+        }
+
+        Node* leftLca = lca(root->left, p, q);
+        Node* rightLca = lca(root->right, p, q);
+
+        if(leftLca && rightLca) return root;
+        else if(leftLca != NULL) return leftLca;
+        else return rightLca;
+    }
+
+    int search(vector<int>& inorder, int left, int right, int val) {
+        for(int i = left; i <= right; i++) {
+            if(inorder[i] == val) return i;
+        }
+
+        return -1;
+    }
+
+    Node* helper(vector<int>& preorder, vector<int>& inorder, int& preIdx, int left, int right) {
+        if(left>right) return NULL;
+
+        Node* root = new Node(preorder[preIdx]);
+
+        int inIdx = search(inorder, left,right, preorder[preIdx]);
+        preIdx++;
+        
+        root->left = helper(preorder, inorder, preIdx, left, inIdx -1);
+        root->right = helper(preorder, inorder, preIdx, inIdx +1, right);
+
+        return root;
+    }
+
+    Node* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        int preIdx = 0;
+        return helper(preorder, inorder, preIdx,0, inorder.size()-1);
+    }
+
+    int sumTree(Node* root) {
+        if(root == NULL) return 0;
+
+        int leftSum = sumTree(root->left);
+        int rightSum = sumTree(root->right);
+
+        root->val += leftSum + rightSum;
+        return root->val;
+    }
+
+    // return all paths from root - leaf (approach - dfs)
+    void allPaths(Node* root, string path, vector<string>& ans) {
+        if(root->left == NULL && root->right == NULL) {
+            ans.push_back(path);
+            return;
+        }
+
+        if(root->left) {
+            allPaths(root->left,path+"->"+to_string(root->left->val), ans);
+        }
+
+        if(root->right) {
+            allPaths(root->right, path+"->"+to_string(root->right->val), ans);
+        }
+    }
+
+    vector<string> binaryTreePaths(Node* root) {
+        // dfs travseral from root - leaf
+        vector<string> ans;
+        string path = to_string(root->val);
+
+        allPaths(root, path, ans);
+        return ans;
+    }
+
+    int widthOfBinaryTree(Node* root) {
+        queue<pair<Node*, unsigned long long>> q;
+        q.push({root, 0});
+
+        int maxWid = 0;
+
+        while(q.size() > 0) {
+            int currSize = q.size();
+            unsigned long long stIdx = q.front().second;
+            unsigned long long endIdx = q.back().second;
+            maxWid = max(maxWid, (int)(endIdx-stIdx + 1));
+
+            for(int i = 0; i < currSize; i++) {
+                auto currNode = q.front();
+                q.pop();
+                if(currNode.first->left) {
+                    q.push({currNode.first->left, currNode.second*2+1});
+                }
+
+                if(currNode.first->right) {
+                    q.push({currNode.first->right, currNode.second*2+2});
+                }
+            }
+        }
+
+        return maxWid;
+    }
+
+    vector<int> morris_inorder_traversal(Node* root) {
+        vector<int> res;
+        Node* curr = root;
+
+        while(curr != NULL) {
+            if(curr->left == NULL) {
+                // If no left child, visit this node 
+                // and go right
+                res.push_back(curr->val);
+                curr = curr->right;
+            }
+
+            else {
+                Node* IP = curr->left;
+                while(IP->right != NULL && IP->right != curr) {
+                    IP = IP->right;
+                }
+                // Make curr the right child of its 
+                // inorder predecessor
+                if(IP->right == NULL) {
+                    // create a thread
+                    IP->right = curr;
+                    curr = curr->left;
+                } else {
+                    IP->right = NULL;
+                    res.push_back(curr->val);
+                    curr = curr->right;
+                }
+            }
+        }
+        return res;
+    }
 };
 
 int main() {
@@ -175,10 +327,14 @@ int main() {
 
     // bt.bfs(root);
 
-    cout << bt.height(root) << endl;
-    cout << "number of nodes - " << bt.countNode(root) << endl;
-    cout << "sum of all nodes - "<< bt.sumOfNodes(root) << endl; 
+    // cout << bt.height(root) << endl;
+    // cout << "number of nodes - " << bt.countNode(root) << endl;
+    // cout << "sum of all nodes - "<< bt.sumOfNodes(root) << endl; 
     
+    //bt.kth_level(root, 2);
+
+    cout << bt.sumTree(root) << endl;
+    bt.preOrderTraverse(root);
 
     return 0;
 }
