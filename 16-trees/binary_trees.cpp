@@ -307,6 +307,19 @@ class BinaryTree {
         }
         return res;
     }
+
+    Node* nextRight;
+    void flatten_binary_to_list(Node* root) {
+        // in place approach where root->left == NULL, root->right = list.next;
+        if(root == NULL) return;
+
+        flatten_binary_to_list(root->right);
+        flatten_binary_to_list(root->left);
+
+        root->left = NULL;
+        root->right = nextRight;
+        nextRight = root;
+    }
 };
 
 int main() {
