@@ -159,6 +159,130 @@ class Binary_Search_Tree{
 
         return searchMin(inorder);
     }
+
+    Node* connect(Node* root) {
+        if(root == NULL || root->left == NULL) return root;
+
+        queue<Node*> q;
+        q.push(root);
+        q.push(NULL);
+
+        Node* prev = NULL;
+
+        while(q.size() > 0) {
+            Node* curr = q.front();
+            q.pop();
+
+            if(curr == NULL) {
+                if(q.size() == 0) {
+                    break;
+                } 
+                q.push(NULL);
+            } else {
+                if(curr->left != NULL) {
+                    q.push(curr->left);
+                } 
+                if(curr->right != NULL) {
+                    q.push(curr->right);
+                }
+                if(prev != NULL) {
+                    prev->next = curr;
+                }
+            }
+            prev = curr;
+        }
+
+        return root;
+    }
+};
+
+class BSTIterator {
+public:
+    stack<TreeNode*> s;
+    void storeLeftNodes(TreeNode* root) {
+        while(root != NULL) {
+            s.push(root);
+            root = root->left;
+        }
+    }
+
+    BSTIterator(TreeNode* root) {
+        // use the helper function here
+        storeLeftNodes(root);
+    }
+    
+    int next() {
+        TreeNode* ans = s.top();
+        s.pop();
+
+        if(ans->right) storeLeftNodes(ans->right);
+
+        return ans->val;
+    }
+    
+    bool hasNext() {
+        return s.size() > 0;
+    }
+};
+
+class FindPredSuccInBST {
+	public:
+	Node* leftMostInRight(Node* root) {
+		Node* ans = root;
+		while (root != NULL) {
+			ans = root->left;
+			root = root->left;
+		}
+		
+		return ans;
+	}
+	
+	Node* rightMostInLeft(Node* root) {
+		Node* ans = root;
+		while (root != NULL) {
+			ans = root->right;
+			root = root->right;
+		}
+		
+		return ans;
+	}
+	
+	vector<Node*> findPreSuc(Node* root, int key) {
+		// code here
+		Node* succ = NULL;
+		Node* pred = NULL;
+		Node* curr = root;
+		
+		vector<Node*> ans;
+		while (curr != NULL) {
+			if (key < curr->data) {
+				succ = curr;
+				curr = curr->left;
+			}
+			else if (key > curr->data) {
+				pred = curr;
+				curr = curr->right;
+			}
+			else if (key == curr->data) {
+				if (curr->left != NULL) {
+					// call for pred helper func
+					pred = rightMostInLeft(root->left);
+				}
+				
+				if (curr->right != NULL) {
+					// call for succ helper func
+					succ = leftMostInRight(root->right);
+				}
+				
+				break;
+			}
+		}
+		
+		ans.push_back(pred);
+		ans.push_back(succ);
+		
+		return ans;
+	}
 };
 
 int main() {
