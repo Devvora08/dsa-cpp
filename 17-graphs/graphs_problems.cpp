@@ -58,6 +58,44 @@ class Graph{
 
             return false;
         }
+        
+        // detect cycle in undirected graph (using BFS) - using helper cycle method
+        bool cycleUndirectedUsingBFS(int src, vector<bool> &vis) {
+            queue<pair<int, int>> q;
+            q.push({src, -1});
+            vis[src] = true;
+
+            while(q.size() > 0) {
+                int u = q.front().first;
+                int parU = q.front().second;
+
+                q.pop();
+
+                list<int> neighbours = l[u];
+                for(int v : neighbours) {
+                    if(!vis[v]) {
+                        q.push({v, u});
+                        vis[v] = true;
+                    } else if(v != parU) {
+                        return true;
+                    } 
+                }
+            }
+
+            return false;
+        }
+
+        bool isCycleBFS() {
+            vector<bool> vis(V, false);
+
+            for(int i = 0; i < V; i++) {
+                if(!vis[i]) {
+                    if(cycleUndirectedUsingBFS(i, vis)) return true;
+                }
+            }
+
+            return false;
+        }
 };
 
 
@@ -71,8 +109,10 @@ int main() {
     g.addEdge(3,4);
 
     g.display_list();
+    cout << endl;
 
-    cout << g.isCycle() << endl;
+    // cout << g.isCycle() << endl;
+    cout << g.isCycleBFS() << endl;
 
     return 0;
 }
